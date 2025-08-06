@@ -1,40 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Sexy Black-and-White Habit Tracker Design System */
 
 @layer base {
   :root {
+    /* Core Monochrome Palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 0 0% 13%;
+    
+    /* Cards & Surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 13%;
+    --card-shadow: 0 0% 0%;
+    
+    /* Interactive Elements */
+    --primary: 0 0% 13%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 0 0% 20%;
+    
+    /* Secondary Elements */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
+    --secondary-hover: 0 0% 92%;
+    
+    /* Subtle Elements */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 53%;
+    
+    /* Accent & Highlights */
+    --accent: 0 0% 89%;
+    --accent-foreground: 0 0% 13%;
+    
+    /* Borders & Dividers */
+    --border: 0 0% 89%;
+    --input: 0 0% 100%;
+    --ring: 0 0% 13%;
+    
+    /* Status Colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 13%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Gradients */
+    --gradient-radial: radial-gradient(circle, hsl(0 0% 100%) 0%, hsl(0 0% 96%) 100%);
+    --gradient-subtle: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 0% 98%) 100%);
+    
+    /* Shadows */
+    --shadow-minimal: 0 1px 3px 0 hsl(0 0% 0% / 0.1);
+    --shadow-card: 0 2px 8px 0 hsl(0 0% 0% / 0.15);
+    --shadow-elevated: 0 8px 32px 0 hsl(0 0% 0% / 0.12);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Typography */
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* Layout */
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
 
     --radius: 0.5rem;
 
@@ -54,9 +88,47 @@ All colors MUST be HSL.
 
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+}
 
-  .dark {
-    --background: 222.2 84% 4.9%;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-family: var(--font-body);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer components {
+  .habit-card {
+    @apply bg-card border border-border shadow-[var(--shadow-card)] 
+           rounded-[var(--radius)] p-4 transition-[var(--transition-smooth)]
+           hover:shadow-[var(--shadow-elevated)];
+  }
+  
+  .timer-ring {
+    transform-origin: center;
+    transition: stroke-dasharray var(--transition-smooth);
+  }
+  
+  .panel-title {
+    @apply text-sm font-semibold tracking-widest uppercase text-muted-foreground;
+  }
+  
+  .glass-effect {
+    background: var(--gradient-subtle);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
     --foreground: 210 40% 98%;
 
     --card: 222.2 84% 4.9%;
