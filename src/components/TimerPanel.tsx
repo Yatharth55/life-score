@@ -3,12 +3,16 @@ import { Play, Pause, Square, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useHabitStore } from '@/store/habitStore';
+import { useSupabaseHabitStore } from '@/store/supabaseHabitStore';
 import { formatTime } from '@/utils/timeUtils';
 
 export const TimerPanel = () => {
-  const { habits, timer, startTimer, pauseTimer, stopTimer } = useHabitStore();
+  const { habits, timer, startTimer, pauseTimer, stopTimer, updateElapsedTime, fetchHabits } = useSupabaseHabitStore();
   const [displayTime, setDisplayTime] = useState(0);
+
+  useEffect(() => {
+    fetchHabits();
+  }, [fetchHabits]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;

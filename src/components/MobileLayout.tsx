@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Timer, Target, User, Menu } from 'lucide-react';
+import { Timer, Target, User, Menu, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { TimerPanel } from './TimerPanel';
@@ -11,6 +12,7 @@ type ActivePanel = 'timer' | 'habits' | 'profile';
 export const MobileLayout = () => {
   const [activePanel, setActivePanel] = useState<ActivePanel>('timer');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const panels = [
     { id: 'timer' as const, label: 'Timer', icon: Timer, component: TimerPanel },
@@ -25,7 +27,14 @@ export const MobileLayout = () => {
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold">HABIT TRACKER</h1>
+          <div>
+            <h1 className="text-xl font-bold">HABIT TRACKER</h1>
+            {user && (
+              <p className="text-sm text-muted-foreground">
+                Welcome, {user.user_metadata?.display_name || user.email?.split('@')[0]}
+              </p>
+            )}
+          </div>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
@@ -72,6 +81,19 @@ export const MobileLayout = () => {
                     </Button>
                   );
                 })}
+                <div className="border-t border-border mt-4 pt-4">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      signOut();
+                      setIsMenuOpen(false);
+                    }}
+                    className="justify-start gap-3 text-destructive hover:text-destructive"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Sign Out
+                  </Button>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>

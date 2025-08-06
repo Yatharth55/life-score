@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { useHabitStore } from '@/store/habitStore';
+import { useSupabaseHabitStore } from '@/store/supabaseHabitStore';
+import { useToast } from '@/hooks/use-toast';
+import { useEffect } from 'react';
 import { Habit } from '@/types/habit';
 import { formatTime, formatDuration } from '@/utils/timeUtils';
 
@@ -20,7 +22,12 @@ interface HabitFormData {
 }
 
 export const HabitsPanel = () => {
-  const { habits, addHabit, updateHabit, deleteHabit } = useHabitStore();
+  const { habits, addHabit, updateHabit, deleteHabit, fetchHabits, loading } = useSupabaseHabitStore();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchHabits();
+  }, [fetchHabits]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [formData, setFormData] = useState<HabitFormData>({
@@ -59,7 +66,7 @@ export const HabitsPanel = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const habitData = {
@@ -70,19 +77,47 @@ export const HabitsPanel = () => {
       goal: formData.goal
     };
 
-    if (editingHabit) {
-      updateHabit(editingHabit.id, habitData);
-    } else {
-      addHabit(habitData);
-    }
+    try {
+      if (editingHabit) {
+        await updateHabit(editingHabit.id, habitData);
+        toast({
+          title: "Habit updated",
+          description: "Your habit has been updated successfully."
+        });
+      } else {
+        await addHabit(habitData);
+        toast({
+          title: "Habit added",
+          description: "Your new habit has been created successfully."
+        });
+      }
 
-    setIsDialogOpen(false);
-    resetForm();
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save habit",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleDelete = (habitId: string) => {
+  const handleDelete = async (habitId: string) => {
     if (confirm('Are you sure you want to delete this habit?')) {
-      deleteHabit(habitId);
+      try {
+        await deleteHabit(habitId);
+        toast({
+          title: "Habit deleted",
+          description: "Your habit has been deleted successfully."
+        });
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to delete habit",
+          variant: "destructive"
+        });
+      }
     }
   };
 

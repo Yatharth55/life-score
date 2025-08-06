@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { SimpleChartContainer } from '@/components/ui/simple-chart';
-import { useHabitStore } from '@/store/habitStore';
+import { useSupabaseHabitStore } from '@/store/supabaseHabitStore';
+import { useAuth } from '@/hooks/useAuth';
 import { formatDuration } from '@/utils/timeUtils';
 
 export const ProfilePanel = () => {
-  const { habits } = useHabitStore();
+  const { habits, fetchHabits } = useSupabaseHabitStore();
+  const { user, signOut } = useAuth();
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
 
@@ -36,24 +38,34 @@ export const ProfilePanel = () => {
   const generateAISuggestions = async () => {
     setIsGeneratingAI(true);
     
-    // Simulate AI generation with realistic suggestions
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const suggestions = [
-      "Focus on your highest-importance habits during peak energy hours (usually morning)",
-      "Consider breaking down larger goals into smaller, more achievable daily targets",
-      "Try habit stacking: link new habits to existing ones for better consistency",
-      "Schedule weekly reviews to assess progress and adjust goals if needed",
-      "Use the 2-minute rule: if a habit takes less than 2 minutes, do it immediately"
-    ];
-    
-    // Select 3 random suggestions
-    const selectedSuggestions = suggestions
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
-    
-    setAiSuggestions(selectedSuggestions);
-    setIsGeneratingAI(false);
+    try {
+      const response = await fetch('/functions/v1/generate-suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ habits })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate suggestions');
+      }
+
+      const data = await response.json();
+      setAiSuggestions(data.suggestions);
+    } catch (error) {
+      console.error('Error generating AI suggestions:', error);
+      
+      // Fallback suggestions
+      const fallbackSuggestions = [
+        "Focus on your highest-importance habits during peak energy hours",
+        "Consider breaking down larger goals into smaller, more achievable daily targets",
+        "Try habit stacking: link new habits to existing ones for better consistency"
+      ];
+      setAiSuggestions(fallbackSuggestions);
+    } finally {
+      setIsGeneratingAI(false);
+    }
   };
 
   return (
